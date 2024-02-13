@@ -48,18 +48,16 @@ export function UserAuthForm() {
             placeholder="password"
             disabled={isLoading}
           />
-          {visible && isLoading ? (
+          {visible ? (
             <Eye
               onClick={() => setVisible(!visible)}
               className="absolute right-6 cursor-pointer"
-              disabled={isLoading}
               size={20}
             />
           ) : (
             <EyeOff
               onClick={() => setVisible(!visible)}
               className="absolute right-6 cursor-pointer"
-              disabled={isLoading}
               size={20}
             />
           )}

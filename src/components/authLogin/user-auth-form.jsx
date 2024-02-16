@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { Github } from "lucide-react";
 import { RotateCw } from "lucide-react";
@@ -8,27 +8,53 @@ import { RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { signIn, useSession } from "next-auth/react";
 
 import { User, Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
+
+import { toast } from 'react-hot-toast'
 
 export function UserAuthForm() {
+  const router = useRouter();
+  const session = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const [visible, setVisible] = useState(false);
 
-  async function onSubmit(event) {
+  const [data, setData] = useState({
+    email: "",
+    password: "",
+  });
+
+  useEffect(() => {
+    if (session?.status === "authenticated") {
+      router.push("/dashboard");
+    }
+  });
+
+  async function loginUser(event) {
     event.preventDefault();
     setIsLoading(true);
 
-    console.log(event.target.email.value);
+    signIn("credentials", {
+      ...data,
+      redirect: false,
+    }).then((callback) => {
+      if(callback?.error) {
+        toast.error(callback.error);
+      }
 
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
+      if(callback?.ok) {
+        toast.success('logged success !')
+        router.push("/dashboard");
+      }
+      
+    });
   }
 
   return (
     <div className="grid gap-6">
-      <form onSubmit={onSubmit} className="flex flex-col gap-y-4">
+      <form onSubmit={loginUser} className="flex flex-col gap-y-4">
         <div className="relative flex items-center">
           <Input
             type="text"
@@ -37,6 +63,10 @@ export function UserAuthForm() {
             autoCapitalize="none"
             autoComplete="email"
             autoCorrect="off"
+            value={data.email}
+            onChange={(e) => {
+              setData({ ...data, email: e.target.value });
+            }}
             disabled={isLoading}
           />
           <User className="absolute right-6" size={20} />
@@ -46,6 +76,10 @@ export function UserAuthForm() {
             type={!visible ? "password" : "text"}
             id="password"
             placeholder="password"
+            value={data.password}
+            onChange={(e) => {
+              setData({ ...data, password: e.target.value });
+            }}
             disabled={isLoading}
           />
           {visible ? (
@@ -62,32 +96,6 @@ export function UserAuthForm() {
             />
           )}
         </div>
-        {/* <div className="grid gap-1">
-            <Label className="sr-only" htmlFor="email">
-              Email
-            </Label>
-            <Input
-              id="email"
-              placeholder="name@example.com"
-              type="email"
-              autoCapitalize="none"
-              autoComplete="email"
-              autoCorrect="off"
-              disabled={isLoading}
-            />
-            <Label className="sr-only" htmlFor="email">
-              Email
-            </Label>
-            <Input
-              id="password"
-              placeholder="name@example.com"
-              type="password"
-              autoCapitalize="none"
-              autoComplete="email"
-              autoCorrect="off"
-              disabled={isLoading}
-            />
-          </div> */}
         <Button disabled={isLoading}>
           {isLoading && <RotateCw className="mr-2 h-4 w-4 animate-spin" />}
           Sign In with Email

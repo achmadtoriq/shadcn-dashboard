@@ -1,6 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import React from "react";
 import { UserAuthForm } from "@/components/authLogin/user-auth-form";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export const metadata = {
   title: "Authentication",
@@ -8,6 +10,7 @@ export const metadata = {
 };
 
 const Login = () => {
+
   return (
     <>
       <div className="container min-h-screen flex flex-row items-center justify-center">

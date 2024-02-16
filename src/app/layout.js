@@ -1,7 +1,12 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Provider from "@/context/Provider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Header from "@/components/Header";
+import ToasterContext from "@/context/ToasterContext";
+// import { ThemeProvider } from "@/components/ThemeProvider";
+// import Header from "@/components/Header";
+// import Provider from "@/context/Provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,12 +18,15 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="light">
-          <Header />
-          {children}
-        </ThemeProvider>
-      </body>
+      <Provider>
+        <body className={inter.className}>
+          <ToasterContext />
+          <ThemeProvider attribute="class" defaultTheme="light">
+            <Header />
+            {children}
+          </ThemeProvider>
+        </body>
+      </Provider>
     </html>
   );
 }

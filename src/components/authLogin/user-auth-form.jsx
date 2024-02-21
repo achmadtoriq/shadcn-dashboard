@@ -8,16 +8,16 @@ import { RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signIn, useSession } from "next-auth/react";
 
 import { User, Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-import { toast } from 'react-hot-toast'
+import { toast } from "react-hot-toast";
+
+import axios from "axios";
 
 export function UserAuthForm() {
   const router = useRouter();
-  const session = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const [visible, setVisible] = useState(false);
 
@@ -26,30 +26,41 @@ export function UserAuthForm() {
     password: "",
   });
 
-  useEffect(() => {
-    if (session?.status === "authenticated") {
-      router.push("/dashboard");
-    }
-  });
-
   async function loginUser(event) {
     event.preventDefault();
     setIsLoading(true);
 
-    signIn("credentials", {
-      ...data,
-      redirect: false,
-    }).then((callback) => {
-      if(callback?.error) {
-        toast.error(callback.error);
-      }
+    console.log(data);
+    const login = await axios.post("/api/login", data);
 
-      if(callback?.ok) {
-        toast.success('logged success !')
+    console.log(login);
+    // .then((res) => {
+    //   console.log(res);
+    //   toast.success("Sukses Login");
+    //   // router.push("/auth/login");
+    // })
+    // .catch((err) => {
+    //   console.log(err);
+    //   toast.error("error login");
+    // });
+
+    if (login.status == 200) {
+      if (login.data.status == 200) {
+        toast.success(login.data.message);
         router.push("/dashboard");
+      } else {
+        toast.error(login.data.message);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 3000);
       }
-      
-    });
+    } else {
+      toast.error("Error System");
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 3000);
+    }
+
   }
 
   return (
